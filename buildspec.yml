@@ -1,0 +1,31 @@
+version: 0.2
+
+env:
+  parameter-store:
+    DOCKER_USERNAME: "/ci-cd/docker/username"
+    DOCKER_PASSWORD: "/ci-cd/docker/password"
+    DOCKER_REGISTRY: "/ci-cd/docker/registry"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+
+  pre_build:
+    commands:
+      - echo "Installing dependencies..."
+      - pip install -r requirements.txt
+      - echo "Logging into Docker..."
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+  build:
+    commands:
+      - echo "Building Docker image..."
+      - docker build -t $DOCKER_USERNAME/aws-ci-app:latest .
+      - docker tag $DOCKER_USERNAME/aws-ci-app:latest $DOCKER_REGISTRY/$DOCKER_USERNAME/aws-ci-app:latest
+
+  post_build:
+    commands:
+      - echo "Pushing Docker image..."
+      - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/aws-ci-app:latest
+      - echo "Build completed successfully!"
