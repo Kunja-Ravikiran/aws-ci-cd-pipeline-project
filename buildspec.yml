@@ -29,7 +29,3 @@ phases:
       - echo "Pushing Docker image..."
       - docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/aws-ci-app:latest
       - echo "Build completed successfully!"
-
-artifacts:
-  files:
-    - '**/*'
